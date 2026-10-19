@@ -1,0 +1,142 @@
+/* KeeVault XC - In-Page Autofill Widget & Save Toast Styles */
+
+.kvxc-inline-menu {
+  position: absolute;
+  z-index: 2147483646;
+  width: 310px;
+  background: rgba(11, 15, 25, 0.96);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(16, 185, 129, 0.45);
+  border-radius: 12px;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(99, 102, 241, 0.25);
+  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #f8fafc;
+  padding: 8px;
+  box-sizing: border-box;
+  animation: kvxcFadeIn 0.14s ease-out;
+}
+
+@keyframes kvxcFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.kvxc-inline-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 8px 6px 8px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #10b981;
+  letter-spacing: 0.4px;
+}
+
+.kvxc-inline-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.12s ease;
+  margin-bottom: 3px;
+}
+
+.kvxc-inline-item:hover {
+  background: rgba(99, 102, 241, 0.22);
+}
+
+.kvxc-inline-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #f8fafc;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 210px;
+}
+
+.kvxc-inline-sub {
+  font-size: 11px;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 210px;
+}
+
+.kvxc-inline-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: rgba(16, 185, 129, 0.18);
+  color: #34d399;
+}
+
+.kvxc-save-toast {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 2147483647;
+  width: 340px;
+  background: rgba(11, 15, 25, 0.97);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(16, 185, 129, 0.55);
+  border-radius: 14px;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.7);
+  padding: 14px 16px;
+  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #f8fafc;
+  animation: kvxcFadeIn 0.18s ease-out;
+}
+
+.kvxc-save-toast-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #10b981;
+  margin-bottom: 4px;
+}
+
+.kvxc-save-toast-sub {
+  font-size: 12px;
+  color: #cbd5e1;
+  margin-bottom: 10px;
+}
+
+.kvxc-save-toast-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.kvxc-btn-primary {
+  flex: 1;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #052e16;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.kvxc-btn-secondary {
+  background: rgba(30, 41, 59, 0.9);
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}

@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+*$py.class
+bridge_state.json
+vidiq_mcp_bridge.py
+*.kdbx
+.env

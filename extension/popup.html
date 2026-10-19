@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KeeVault XC — Cofre .KDBX, GitHub Privado & MCP IA</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Top Brand Header -->
+    <header class="top-header">
+      <div class="brand-left">
+        <img src="icons/icon48.png" alt="KeeVault XC" class="brand-logo" />
+        <div>
+          <div class="brand-title-row">
+            <span class="brand-title">KeeVault XC</span>
+            <span class="brand-badge" id="header-vault-badge">KDBX • AES-256</span>
+          </div>
+          <div class="brand-subtitle" id="header-sync-status">100% Local no Chrome • GitHub Privado • MCP IA</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="btn-open-tab" title="Abrir em Aba Cheia">⛶</button>
+        <button class="lock-btn hidden" id="btn-lock-now" title="Trancar Cofre Agora (OFF)">🔒 Trancar</button>
+      </div>
+    </header>
+
+    <!-- =================================================================== -->
+    <!-- LOCKED / ONBOARDING SCREEN (Shown when vault is not created or locked) -->
+    <!-- =================================================================== -->
+    <section id="auth-screen" class="auth-screen">
+      <!-- Mode Switcher: Unlock | Create New | Clone from GitHub -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-auth-mode="unlock" id="tab-auth-unlock">🔓 Destrancar</button>
+        <button class="auth-tab" data-auth-mode="create" id="tab-auth-create">✨ Novo Cofre .KDBX</button>
+        <button class="auth-tab" data-auth-mode="clone" id="tab-auth-clone">🐙 Baixar do GitHub</button>
+      </div>
+
+      <!-- 1. UNLOCK EXISTING VAULT -->
+      <div id="auth-panel-unlock" class="auth-panel">
+        <div class="auth-hero">
+          <div class="auth-hero-icon">🔐</div>
+          <h2>Cofre Criptografado (.KDBX)</h2>
+          <p>Digite sua Senha Mestra para descriptografar na memória local.</p>
+        </div>
+
+        <label class="field-label">Senha Mestra</label>
+        <div class="input-group">
+          <input type="password" id="unlock-password" class="text-input" placeholder="Digite sua Senha Mestra..." autofocus />
+          <button class="eye-btn" data-toggle-pass="unlock-password">👁️</button>
+        </div>
+
+        <input type="hidden" id="unlock-keyfile" value="" />
+
+        <div class="perm-switch-card mt-10">
+          <div>
+            <div class="perm-title">🔓 Manter Destrancado Permanentemente (ON/OFF)</div>
+            <div class="perm-sub">Não expira por tempo; só tranca quando você clicar em "Trancar"</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="unlock-permanent-chk" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <button class="primary-cta mt-12" id="btn-do-unlock">🔓 Destrancar Cofre Agora</button>
+      </div>
+
+      <!-- 2. CREATE NEW VAULT -->
+      <div id="auth-panel-create" class="auth-panel hidden">
+        <div class="auth-hero compact">
+          <h2>Criar Novo Cofre .KDBX</h2>
+          <p>Compatível com KeePassXC • Criptografia militar AES-256-GCM + PBKDF2 (600.000 iterações).</p>
+        </div>
+
+        <label class="field-label">Nome do Cofre</label>
+        <input type="text" id="create-vault-name" class="text-input" value="Meu Cofre Principal" />
+
+        <label class="field-label mt-8">Defina sua Senha Mestra</label>
+        <div class="input-group">
+          <input type="password" id="create-password" class="text-input" placeholder="Escolha uma Senha Mestra forte..." />
+          <button class="eye-btn" data-toggle-pass="create-password">👁️</button>
+        </div>
+
+        <input type="hidden" id="create-keyfile" value="" />
+
+        <div class="perm-switch-card mt-8">
+          <div>
+            <div class="perm-title">🔓 Sessão Permanente (ON)</div>
+            <div class="perm-sub">Manter destrancado até você desligar no botão ON/OFF</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="create-permanent-chk" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="perm-switch-card mt-6">
+          <div>
+            <div class="perm-title">✨ Incluir 2 exemplos iniciais</div>
+            <div class="perm-sub">Cria entradas de exemplo para você já testar Autofill e MCP</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="create-demo-chk" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <button class="primary-cta mt-10" id="btn-do-create">🚀 Criar Cofre Criptografado (.KDBX)</button>
+      </div>
+
+      <!-- 3. CLONE EXISTING VAULT FROM PRIVATE GITHUB -->
+      <div id="auth-panel-clone" class="auth-panel hidden">
+        <div class="auth-hero compact">
+          <h2>Restaurar Cofre do GitHub Privado</h2>
+          <p>Use em qualquer computador novo: basta seu Token PAT, repositório e Senha Mestra!</p>
+        </div>
+
+        <label class="field-label">GitHub Personal Access Token (PAT)</label>
+        <input type="password" id="clone-gh-token" class="text-input" placeholder="ghp_... ou github_pat_..." />
+
+        <label class="field-label mt-6">Repositório Privado (usuario/repositorio)</label>
+        <input type="text" id="clone-gh-repo" class="text-input" placeholder="ex: rapha/meu-cofre-privado" />
+
+        <label class="field-label mt-6">Caminho do arquivo .KDBX</label>
+        <input type="text" id="clone-gh-path" class="text-input" value="cofre.kdbx" />
+
+        <label class="field-label mt-6">Sua Senha Mestra do Cofre</label>
+        <input type="password" id="clone-master-password" class="text-input" placeholder="Senha Mestra para descriptografar..." />
+
+        <button class="primary-cta mt-10" id="btn-do-clone">🐙 Baixar & Destrancar do GitHub</button>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- UNLOCKED STUDIO INTERFACE -->
+    <!-- =================================================================== -->
+    <section id="studio-screen" class="studio-screen hidden">
+      <!-- Dual Permanent ON/OFF Control Ribbon -->
+      <div class="control-ribbon">
+        <div class="ribbon-pill">
+          <div class="ribbon-text">
+            <span class="ribbon-title">🔓 Permanente</span>
+            <span class="ribbon-sub" id="lbl-perm-state">ON (Sem expirar)</span>
+          </div>
+          <label class="switch sm">
+            <input type="checkbox" id="toggle-permanent-unlock" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="ribbon-pill">
+          <div class="ribbon-text">
+            <span class="ribbon-title">🤖 MCP para IA</span>
+            <span class="ribbon-sub" id="lbl-mcp-state">ON (Blind Login)</span>
+          </div>
+          <label class="switch sm indigo">
+            <input type="checkbox" id="toggle-mcp-access" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Navigation Bar (5 Views) -->
+      <nav class="studio-nav">
+        <button class="nav-btn active" data-view="vault">🔐 Cofre</button>
+        <button class="nav-btn" data-view="editor" id="nav-btn-editor">➕ Nova</button>
+        <button class="nav-btn" data-view="generator">🎲 Gerador</button>
+        <button class="nav-btn" data-view="github">🐙 GitHub</button>
+        <button class="nav-btn" data-view="mcp">🤖 MCP IA</button>
+      </nav>
+
+      <!-- VIEW 1: VAULT & ENTRIES -->
+      <div id="view-vault" class="studio-view">
+        <!-- Active Tab Match Banner -->
+        <div id="active-tab-banner" class="active-tab-banner hidden">
+          <div class="tab-banner-left">
+            <span class="tab-banner-dot">⚡</span>
+            <div>
+              <div class="tab-banner-title" id="tab-banner-title">Login detectado para este site</div>
+              <div class="tab-banner-sub" id="tab-banner-sub">Clique para preencher automaticamente</div>
+            </div>
+          </div>
+          <button class="tab-banner-btn" id="btn-quick-fill-banner">Preencher</button>
+        </div>
+
+        <!-- Search & Group Filter -->
+        <div class="search-row">
+          <input type="text" id="vault-search" class="text-input search-input" placeholder="🔍 Buscar por site, título, usuário ou nota..." />
+        </div>
+
+        <div class="group-pills" id="group-pills-bar">
+          <button class="group-pill active" data-group="all">Todos</button>
+          <button class="group-pill" data-group="fav">⭐ Favoritos</button>
+          <button class="group-pill" data-group="ai">🤖 Liberados IA</button>
+          <button class="group-pill" data-group="work">💻 Trabalho</button>
+          <button class="group-pill" data-group="social">🌐 Redes</button>
+          <button class="group-pill" data-group="finance">💳 Finanças</button>
+        </div>
+
+        <!-- Entries List -->
+        <div id="entries-list" class="entries-list"></div>
+      </div>
+
+      <!-- VIEW 2: ADD / EDIT CREDENTIAL -->
+      <div id="view-editor" class="studio-view hidden">
+        <div class="section-hdr">
+          <h3 id="editor-form-title">➕ Adicionar Nova Senha ao Cofre</h3>
+          <button class="ghost-btn" id="btn-autofill-current-url">🌐 Usar URL da Aba Atual</button>
+        </div>
+
+        <input type="hidden" id="edit-entry-id" value="" />
+
+        <div class="grid-2">
+          <div>
+            <label class="field-label">Título / Nome do Serviço</label>
+            <input type="text" id="edit-title" class="text-input" placeholder="Ex: Google, GitHub, Netflix..." />
+          </div>
+          <div>
+            <label class="field-label">Grupo / Categoria</label>
+            <select id="edit-group" class="text-input">
+              <option value="general">🔐 Geral</option>
+              <option value="work">💻 Trabalho & Dev</option>
+              <option value="ai">🤖 IAs & Automação</option>
+              <option value="social">🌐 Redes & E-mail</option>
+              <option value="finance">💳 Bancos & Finanças</option>
+              <option value="servers">🖥️ Servidores & SSH</option>
+            </select>
+          </div>
+        </div>
+
+        <label class="field-label mt-6">Usuário / E-mail / Login</label>
+        <input type="text" id="edit-username" class="text-input" placeholder="seu-email@dominio.com ou usuario" />
+
+        <label class="field-label mt-6">Senha</label>
+        <div class="input-group">
+          <input type="password" id="edit-password" class="text-input mono" placeholder="Digite ou clique em 🎲 Gerar..." />
+          <button class="eye-btn" data-toggle-pass="edit-password" title="Mostrar/Ocultar">👁️</button>
+          <button class="gen-inline-btn" id="btn-edit-gen-pass" title="Gerar Senha Forte">🎲 Gerar</button>
+        </div>
+
+        <label class="field-label mt-6">URL do Site (para Auto-Preenchimento)</label>
+        <input type="text" id="edit-url" class="text-input" placeholder="https://..." />
+
+        <label class="field-label mt-6">Segredo 2FA / TOTP (Opcional — Base32 ou otpauth://)</label>
+        <input type="text" id="edit-totp" class="text-input mono" placeholder="Ex: JBSWY3DPEHPK3PXP (gera código de 6 dígitos automático)" />
+
+        <label class="field-label mt-6">Notas / Códigos de Recuperação</label>
+        <textarea id="edit-notes" class="text-input textarea" rows="2" placeholder="Anotações seguras criptografadas..."></textarea>
+
+        <div class="perm-switch-card mt-8">
+          <div>
+            <div class="perm-title">🤖 Permitir Login Cego por IA (MCP)</div>
+            <div class="perm-sub">A IA vê que este login existe e pode logar sem nunca ler a senha</div>
+          </div>
+          <label class="switch indigo">
+            <input type="checkbox" id="edit-ai-allowed" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="perm-switch-card mt-6">
+          <div>
+            <div class="perm-title">⭐ Marcar como Favorito</div>
+            <div class="perm-sub">Aparece sempre no topo da lista</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="edit-favorite" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="editor-actions mt-10">
+          <button class="primary-cta" id="btn-save-entry">💾 Salvar no Cofre & Sincronizar</button>
+          <button class="secondary-cta" id="btn-cancel-edit">Cancelar</button>
+        </div>
+      </div>
+
+      <!-- VIEW 3: PASSWORD & PASSPHRASE GENERATOR -->
+      <div id="view-generator" class="studio-view hidden">
+        <div class="gen-display-card">
+          <div class="gen-output" id="gen-password-output">Carregando...</div>
+          <div class="gen-meta-row">
+            <span class="entropy-badge" id="gen-entropy-badge">128 bits • Militar</span>
+            <div class="gen-btn-group">
+              <button class="small-btn" id="btn-gen-refresh">🔄 Nova</button>
+              <button class="small-btn emerald" id="btn-gen-copy">📋 Copiar</button>
+              <button class="small-btn indigo" id="btn-gen-fill-tab">⚡ Inserir na Aba</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-box mt-10">
+          <div class="grid-2">
+            <div>
+              <label class="field-label">Modo de Geração</label>
+              <select id="gen-mode" class="text-input">
+                <option value="password">🔐 Caracteres Aleatórios</option>
+                <option value="passphrase">📖 Frase-Senha (Diceware PT-BR)</option>
+              </select>
+            </div>
+            <div>
+              <label class="field-label">Tamanho: <span id="gen-len-val">20</span></label>
+              <input type="range" id="gen-length" min="8" max="64" value="20" class="range-slider" />
+            </div>
+          </div>
+
+          <div class="chk-grid mt-8">
+            <label class="chk-item"><input type="checkbox" id="gen-upper" checked /> Maiúsculas (A-Z)</label>
+            <label class="chk-item"><input type="checkbox" id="gen-lower" checked /> Minúsculas (a-z)</label>
+            <label class="chk-item"><input type="checkbox" id="gen-digits" checked /> Números (0-9)</label>
+            <label class="chk-item"><input type="checkbox" id="gen-symbols" checked /> Símbolos (!@#$%)</label>
+            <label class="chk-item"><input type="checkbox" id="gen-no-ambig" checked /> Evitar ambíguos (0,O,1,l)</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 4: GITHUB PRIVATE SYNC & KDBX IMPORT/EXPORT -->
+      <div id="view-github" class="studio-view hidden">
+        <div class="card-box">
+          <div class="card-title">🐙 Sincronização com GitHub Privado (.KDBX)</div>
+          <p class="card-desc">
+            Seu arquivo <code>.kdbx</code> vai 100% criptografado (AES-256-GCM) para um repositório privado seu.
+            Se o repositório ainda não existir, nós criamos ele como <strong>Privado</strong> automaticamente!
+          </p>
+
+          <label class="field-label mt-6">GitHub Personal Access Token (PAT com permissão 'repo')</label>
+          <input type="password" id="gh-token" class="text-input" placeholder="ghp_... ou github_pat_..." />
+
+          <div class="grid-2 mt-6">
+            <div>
+              <label class="field-label">Repositório Privado</label>
+              <input type="text" id="gh-repo" class="text-input" placeholder="ex: meu-cofre-senhas" />
+            </div>
+            <div>
+              <label class="field-label">Arquivo no Repo</label>
+              <input type="text" id="gh-filepath" class="text-input" value="cofre.kdbx" />
+            </div>
+          </div>
+
+          <div class="perm-switch-card mt-8">
+            <div>
+              <div class="perm-title">🔄 Auto-Sync Automático a cada alteração</div>
+              <div class="perm-sub">Faz commit/push criptografado sempre que você salvar uma senha</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="gh-autosync" checked />
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="gh-actions-row mt-10">
+            <button class="primary-cta" id="btn-gh-sync-both">🚀 Salvar & Sincronizar Agora (Merge + Push)</button>
+          </div>
+          <div class="grid-2 mt-6">
+            <button class="secondary-cta" id="btn-gh-pull">⬇️ Pull do GitHub</button>
+            <button class="secondary-cta" id="btn-gh-push">⬆️ Forçar Push</button>
+          </div>
+        </div>
+
+        <div class="card-box mt-10">
+          <div class="card-title">📦 Interoperabilidade KeePassXC Desktop (.KDBX / .XML / .CSV)</div>
+          <div class="grid-2 mt-6">
+            <button class="secondary-cta" id="btn-export-kdbx">💾 Baixar .KDBX</button>
+            <button class="secondary-cta" id="btn-export-xml">📄 Exportar XML KeePassXC</button>
+          </div>
+          <div class="mt-6">
+            <label class="secondary-cta file-upload-lbl">
+              📥 Importar Arquivo (.KDBX / XML / CSV do KeePassXC ou Chrome)
+              <input type="file" id="file-import-input" accept=".kdbx,.xml,.csv,.json" class="hidden" />
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 5: MCP AI BRIDGE & ZERO-KNOWLEDGE AUDIT -->
+      <div id="view-mcp" class="studio-view hidden">
+        <div class="card-box">
+          <div class="mcp-status-row">
+            <div>
+              <div class="card-title">🤖 Ponte MCP para Agentes de IA (Antigravity / Claude)</div>
+              <div class="card-desc" id="mcp-bridge-status-txt">Verificando servidor local em 127.0.0.1:18455...</div>
+            </div>
+            <span class="status-pill" id="mcp-live-pill">ATIVO</span>
+          </div>
+
+          <div class="mcp-explainer mt-8">
+            <div>🛡️ <strong>Como a IA usa suas senhas sem nunca vê-las:</strong></div>
+            <ul>
+              <li><strong>1. Catálogo Seguro:</strong> A IA vê apenas o Título, URL e Usuário das contas marcadas com <code>🤖 IA ON</code>.</li>
+              <li><strong>2. Blind Autofill:</strong> A IA envia o comando <code>keevault_autofill_login</code> e a extensão injeta a senha direto no navegador.</li>
+              <li><strong>3. 2FA Automático:</strong> A IA pode solicitar o código TOTP temporário de 6 dígitos para passar pela verificação de 2 etapas.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card-box mt-10">
+          <div class="card-title">📜 Registro de Auditoria de Acessos da IA (MCP)</div>
+          <div id="mcp-audit-list" class="audit-list mt-6"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bottom Toast Notification -->
+    <div id="toast-bar" class="toast-bar hidden"></div>
+  </div>
+
+  <script src="crypto_engine.js"></script>
+  <script src="github_sync.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
